@@ -14,7 +14,7 @@ export const register = async (req, res) =>{
         if (usernameExists || emailExists){
             return res.status(404).json({success: false, message: "User already exists"})
         } 
-        const salt = bcrypt.genSalt();
+        const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(password, salt);
         
         const newUser = new Users({
@@ -50,7 +50,7 @@ export const login = async (req, res) => {
             return res.status(401).json({success: false, message: "wrong password"});
         }
         const token = jwt.sign({userId: user._id}, secret, {expiresIn: '1h'});
-        return res.status(200).json({success: false, token, message: "successfully logged in user"})
+        return res.status(200).json({success: true, token, message: "successfully logged in user"})
     }
     catch(error){
         console.log("login error")
