@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../components/ThemeContext";
 import axios from 'axios';
 
 const Auth = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const [nightMode, setNightMode] = useState(() => {
-    const saved = localStorage.getItem("nightMode");
-    return saved === "true";
-  });
-
+  const { nightMode, setNightMode } = useTheme();
   const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({
     identifier: "",
@@ -82,6 +79,7 @@ const Auth = () => {
             password: "",
             confirmPassword: "",
           });
+          navigate('/dashboard');
         } else {
           alert(message || "Login failed.");
         }

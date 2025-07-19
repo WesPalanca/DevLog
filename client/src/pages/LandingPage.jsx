@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../components/ThemeContext";
 
 const LandingPage = () => {
-  const [nightMode, setNightMode] = useState(() => {
-    const saved = localStorage.getItem("nightMode");
-    return saved === "true"; // default to false if null
-  });
+  const { nightMode, setNightMode } = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
