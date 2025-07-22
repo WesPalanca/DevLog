@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar"; // Adjust path if needed
+import Sidebar from "../components/Sidebar";
+import { useTheme } from "../components/ThemeContext";
 
 
 
 const Dashboard = () => {
-  const [nightMode, setNightMode] = useState(() => {
-    const saved = localStorage.getItem("nightMode");
-    return saved === "true";
-  });
-
+  const { nightMode, setNightMode} = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -19,7 +16,7 @@ const Dashboard = () => {
     <div
       className={`flex min-h-screen transition-colors duration-300 ${
         nightMode ? "bg-[#0d1117] text-white" : "bg-gray-50 text-gray-900"
-      }`}
+      } `}
       style={{ position: "relative" }}
     >
       {/* Sidebar with toggle inside */}
