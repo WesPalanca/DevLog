@@ -7,11 +7,6 @@ const GithubStats = ({ username, nightMode }) => {
     Authorization: `token ${GITHUB_TOKEN}`,
   };
 
-  const [languageStats, setLanguageStats] = useState({});
-  const [commitStats, setCommitStats] = useState(0);
-  const [repoCommits, setRepoCommits] = useState([]);
-  const [loading, setLoading] = useState(false);
-
   const timeRanges = [
     { label: "Last year", days: 365 },
     { label: "Last half year", days: 182 },
@@ -21,49 +16,47 @@ const GithubStats = ({ username, nightMode }) => {
   ];
 
   const [selectedRange, setSelectedRange] = useState(timeRanges[2]); // Default: Last month
+  const [languageStats, setLanguageStats] = useState({});
+  const [commitStats, setCommitStats] = useState(0);
+  const [repoCommits, setRepoCommits] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const getCacheKey = (label) => `githubStats-${username}-${label}`;
-  const isExpired = (timestamp) => {
-    const TWELVE_HOURS = 1000 * 60 * 60 * 12;
-    return Date.now() - timestamp > TWELVE_HOURS;
-  };
-
-  // Preload all ranges once when username changes
   useEffect(() => {
     if (!username || username === "[John Doe]") return;
 
-    const fetchRangeData = async (range) => {
-      const cacheKey = getCacheKey(range.label);
-      const cached = localStorage.getItem(cacheKey);
-
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (!isExpired(parsed.timestamp)) return; // Skip fetch if fresh
-      }
-
+    const fetchStats = async () => {
+      setLoading(true);
       try {
+        // Fetch repos
         const reposRes = await fetch(
           `https://api.github.com/users/${username}/repos?per_page=100`,
           { headers: githubHeaders }
         );
         const repos = await reposRes.json();
 
-        const langStats = {};
-        for (const repo of repos) {
-          const langRes = await fetch(repo.languages_url, { headers: githubHeaders });
-          const langData = await langRes.json();
-          for (const [lang, bytes] of Object.entries(langData)) {
-            langStats[lang] = (langStats[lang] || 0) + bytes;
-          }
-        }
-
+        // Calculate since date based on selectedRange
         const since = new Date();
-        since.setDate(since.getDate() - range.days);
+        since.setDate(since.getDate() - selectedRange.days);
 
+        // Languages aggregation
+        const langStats = {};
+        // Commits aggregation
         let totalCommits = 0;
         const commitsPerRepo = [];
 
         for (const repo of repos) {
+          // Get languages
+          try {
+            const langRes = await fetch(repo.languages_url, { headers: githubHeaders });
+            const langData = await langRes.json();
+            for (const [lang, bytes] of Object.entries(langData)) {
+              langStats[lang] = (langStats[lang] || 0) + bytes;
+            }
+          } catch {
+            // Ignore language fetch errors
+          }
+
+          // Get commits since 'since'
           try {
             const commitsRes = await fetch(
               `https://api.github.com/repos/${username}/${repo.name}/commits?since=${since.toISOString()}`,
@@ -79,55 +72,25 @@ const GithubStats = ({ username, nightMode }) => {
           }
         }
 
-        const dataToCache = {
-          totalCommits,
-          commitsPerRepo,
-          languageStats: langStats,
-        };
-
-        localStorage.setItem(
-          cacheKey,
-          JSON.stringify({ data: dataToCache, timestamp: Date.now() })
-        );
-      } catch (err) {
-        console.error("Error preloading:", range.label, err);
+        setLanguageStats(langStats);
+        setCommitStats(totalCommits);
+        setRepoCommits(commitsPerRepo);
+      } catch (error) {
+        console.error("Error fetching GitHub stats:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const preloadAllRanges = async () => {
-      setLoading(true);
-      await Promise.all(timeRanges.map(fetchRangeData));
-      setLoading(false);
-    };
-
-    preloadAllRanges();
-  }, [username]);
-
-  // When selectedRange changes, pull from cache
-  useEffect(() => {
-    if (!username) return;
-    const cacheKey = getCacheKey(selectedRange.label);
-    const cached = localStorage.getItem(cacheKey);
-
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      if (!isExpired(parsed.timestamp)) {
-        setCommitStats(parsed.data.totalCommits);
-        setRepoCommits(parsed.data.commitsPerRepo);
-        setLanguageStats(parsed.data.languageStats);
-        return;
-      }
-    }
-
-    setLoading(true); // fallback loading if not cached (should rarely happen)
-  }, [selectedRange, username]);
+    fetchStats();
+  }, [username, selectedRange]);
 
   return (
     <div
-      className={`mt-6 p-6 rounded-lg shadow-md border ${
+      className={`mt-6 p-6 rounded-lg shadow-md ${
         nightMode
-          ? "bg-[#161b22] border-gray-700 text-white"
-          : "bg-white border border-gray-200 text-gray-900"
+          ? "bg-[#161b22] text-white"
+          : "bg-white text-gray-900"
       }`}
     >
       <h3 className="text-xl font-semibold mb-4">GitHub Stats for {username}</h3>
@@ -180,6 +143,7 @@ const GithubStats = ({ username, nightMode }) => {
                   {lang}: {bytes.toLocaleString()} bytes
                 </li>
               ))}
+              {Object.keys(languageStats).length === 0 && <li>No language data found.</li>}
             </ul>
           </div>
         </>
