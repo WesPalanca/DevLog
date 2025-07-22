@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import UserLogs from './pages/UserLogs';
 import CreateLog from './pages/CreateLog';
 import SingleLogPage from './pages/SingleLogPage';
+import Profile from './pages/Profile';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path='/logs' element={<ProtectedRoute> <UserLogs /> </ProtectedRoute>}></Route>
         <Route path='/logs/create' element={<ProtectedRoute> <CreateLog /> </ProtectedRoute>} />
         <Route path="/logs/:logId" element={<ProtectedRoute> <SingleLogPage /> </ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
 
         
       </Routes>
