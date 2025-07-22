@@ -13,7 +13,13 @@ const Auth = () => {
     username: "",
     password: "",
     confirmPassword: "",
+    github: "",
+    leetcode: "",
   });
+
+  // State for checkboxes: GitHub and LeetCode usernames same as username by default
+  const [useSameGithub, setUseSameGithub] = useState(true);
+  const [useSameLeetcode, setUseSameLeetcode] = useState(true);
 
   const navigate = useNavigate();
 
@@ -23,6 +29,7 @@ const Auth = () => {
       navigate("/dashboard"); 
     }
   }, []);
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -34,17 +41,18 @@ const Auth = () => {
     e.preventDefault();
 
     try {
-      //Registration
       if (isRegister) {
         if (formData.password !== formData.confirmPassword) {
           alert("Passwords do not match");
           return;
         }
 
-        const response = await axios.post(`${apiUrl}/user/register`, {
+        const response = await axios.post(`${apiUrl}/auth/register`, {
           email: formData.email,
           username: formData.username,
           password: formData.password,
+          github: useSameGithub ? formData.username : formData.github,
+          leetcode: useSameLeetcode ? formData.username : formData.leetcode,
         });
 
         const { success, message } = response.data;
@@ -56,13 +64,18 @@ const Auth = () => {
             username: "",
             password: "",
             confirmPassword: "",
+            github: "",
+            leetcode: "",
           });
+          setUseSameGithub(true);
+          setUseSameLeetcode(true);
         } else {
           alert(message || "Registration failed.");
         }
 
-      } else { // Login
-        const response = await axios.post(`${apiUrl}/user/login`, {
+      } else {
+        // Login
+        const response = await axios.post(`${apiUrl}/auth/login`, {
           identifier: formData.identifier,
           password: formData.password,
         });
@@ -78,7 +91,11 @@ const Auth = () => {
             username: "",
             password: "",
             confirmPassword: "",
+            github: "",
+            leetcode: "",
           });
+          setUseSameGithub(true);
+          setUseSameLeetcode(true);
           navigate('/dashboard');
         } else {
           alert(message || "Login failed.");
@@ -244,6 +261,66 @@ const Auth = () => {
                   }`}
                 />
               </label>
+
+              {/* Checkboxes and conditional inputs for GitHub and LeetCode */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="sameGithub"
+                  checked={useSameGithub}
+                  onChange={() => setUseSameGithub(!useSameGithub)}
+                  className="h-4 w-4"
+                />
+                <label htmlFor="sameGithub" className="text-sm cursor-pointer">
+                  GitHub username is the same as username
+                </label>
+              </div>
+              {!useSameGithub && (
+                <label className="block text-sm font-medium">
+                  GitHub Username
+                  <input
+                    type="text"
+                    name="github"
+                    value={formData.github}
+                    onChange={handleChange}
+                    className={`w-full mt-1 px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 ${
+                      nightMode
+                        ? "bg-[#0d1117] text-white border-gray-700 focus:ring-blue-500"
+                        : "bg-gray-100 text-gray-900 border-gray-300 focus:ring-blue-500"
+                    }`}
+                  />
+                </label>
+              )}
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="sameLeetcode"
+                  checked={useSameLeetcode}
+                  onChange={() => setUseSameLeetcode(!useSameLeetcode)}
+                  className="h-4 w-4"
+                />
+                <label htmlFor="sameLeetcode" className="text-sm cursor-pointer">
+                  LeetCode username is the same as username
+                </label>
+              </div>
+              {!useSameLeetcode && (
+                <label className="block text-sm font-medium">
+                  LeetCode Username
+                  <input
+                    type="text"
+                    name="leetcode"
+                    value={formData.leetcode}
+                    onChange={handleChange}
+                    className={`w-full mt-1 px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 ${
+                      nightMode
+                        ? "bg-[#0d1117] text-white border-gray-700 focus:ring-blue-500"
+                        : "bg-gray-100 text-gray-900 border-gray-300 focus:ring-blue-500"
+                    }`}
+                  />
+                </label>
+              )}
+
               <button
                 type="submit"
                 className="w-full mt-4 py-3 rounded-lg font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
