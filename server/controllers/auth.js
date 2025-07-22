@@ -8,7 +8,7 @@ dotenv.config();
 // basic register function
 export const register = async (req, res) =>{
     try{
-        const { email, username, password} = req.body;
+        const { email, username, password, github, leetcode} = req.body;
         const usernameExists = await Users.findOne({username: username});
         const emailExists = await Users.findOne({email: email});
         if (usernameExists || emailExists){
@@ -16,11 +16,14 @@ export const register = async (req, res) =>{
         } 
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(password, salt);
+
         
         const newUser = new Users({
             email: email,
             username: username,
-            password: hashedPassword
+            password: hashedPassword,
+            github: github || username,
+            leetcode: leetcode || username
         });
         await newUser.save();
         return res.status(200).json({success: true, message: "successfully registered user"});
