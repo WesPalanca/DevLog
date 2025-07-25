@@ -27,27 +27,25 @@ const GithubStats = ({ username, nightMode }) => {
     const fetchStats = async () => {
       setLoading(true);
       try {
-        // Fetch repos
         const reposRes = await fetch(
           `https://api.github.com/users/${username}/repos?per_page=100`,
           { headers: githubHeaders }
         );
         const repos = await reposRes.json();
 
-        // Calculate since date based on selectedRange
         const since = new Date();
         since.setDate(since.getDate() - selectedRange.days);
 
-        // Languages aggregation
         const langStats = {};
-        // Commits aggregation
         let totalCommits = 0;
         const commitsPerRepo = [];
 
         for (const repo of repos) {
           // Get languages
           try {
-            const langRes = await fetch(repo.languages_url, { headers: githubHeaders });
+            const langRes = await fetch(repo.languages_url, {
+              headers: githubHeaders,
+            });
             const langData = await langRes.json();
             for (const [lang, bytes] of Object.entries(langData)) {
               langStats[lang] = (langStats[lang] || 0) + bytes;
@@ -72,7 +70,19 @@ const GithubStats = ({ username, nightMode }) => {
           }
         }
 
-        setLanguageStats(langStats);
+        // Compute total bytes
+        const totalBytes = Object.values(langStats).reduce((sum, b) => sum + b, 0);
+
+        // Create a new object with both percentage and bytes
+        const langPercentages = {};
+        for (const [lang, bytes] of Object.entries(langStats)) {
+          langPercentages[lang] = {
+            percent: ((bytes / totalBytes) * 100).toFixed(2),
+            bytes,
+          };
+        }
+
+        setLanguageStats(langPercentages);
         setCommitStats(totalCommits);
         setRepoCommits(commitsPerRepo);
       } catch (error) {
@@ -88,12 +98,12 @@ const GithubStats = ({ username, nightMode }) => {
   return (
     <div
       className={`mt-6 p-6 rounded-lg shadow-md ${
-        nightMode
-          ? "bg-[#161b22] text-white"
-          : "bg-white text-gray-900"
+        nightMode ? "bg-[#161b22] text-white" : "bg-white text-gray-900"
       }`}
     >
-      <h3 className="text-xl font-semibold mb-4">GitHub Stats for {username}</h3>
+      <h3 className="text-xl font-semibold mb-4">
+        GitHub Stats for {username}
+      </h3>
 
       {/* Time Range Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
@@ -121,7 +131,8 @@ const GithubStats = ({ username, nightMode }) => {
       ) : (
         <>
           <div className="mb-4">
-            <strong>Total commits in {selectedRange.label.toLowerCase()}:</strong> {commitStats}
+            <strong>Total commits in {selectedRange.label.toLowerCase()}:</strong>{" "}
+            {commitStats}
           </div>
 
           <div className="mb-4">
@@ -138,12 +149,14 @@ const GithubStats = ({ username, nightMode }) => {
           <div>
             <strong>Language breakdown:</strong>
             <ul className="list-disc list-inside">
-              {Object.entries(languageStats).map(([lang, bytes]) => (
+              {Object.entries(languageStats).map(([lang, data]) => (
                 <li key={lang}>
-                  {lang}: {bytes.toLocaleString()} bytes
+                  {lang}: {data.percent}% ({data.bytes.toLocaleString()} bytes)
                 </li>
               ))}
-              {Object.keys(languageStats).length === 0 && <li>No language data found.</li>}
+              {Object.keys(languageStats).length === 0 && (
+                <li>No language data found.</li>
+              )}
             </ul>
           </div>
         </>
