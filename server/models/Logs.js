@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 
 const logsSchema = new mongoose.Schema({
-    user_id: {type: String, required: true},
+    user_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Users', required: true},
     title: {type: String, required: true},
     description: {type: String, required: true},
     tech: {type: [String], default: [], required: false},
