@@ -7,6 +7,7 @@ import UserLogs from './pages/UserLogs';
 import CreateLog from './pages/CreateLog';
 import SingleLogPage from './pages/SingleLogPage';
 import Profile from './pages/Profile';
+import Goals from './pages/Goals';
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path='/logs/create' element={<ProtectedRoute> <CreateLog /> </ProtectedRoute>} />
         <Route path="/logs/:logId" element={<ProtectedRoute> <SingleLogPage /> </ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
+        <Route path='/goals' element={<ProtectedRoute> <Goals /> </ProtectedRoute>} />
 
         
       </Routes>

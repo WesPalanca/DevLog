@@ -35,8 +35,8 @@ const Sidebar = ({ nightMode, setNightMode, sidebarOpen, setSidebarOpen }) => {
                 <Link to="/logs" className={`hover:underline ${nightMode ? "text-gray-200" : "text-gray-800"}`}>
                   📜 Your Logs
                 </Link>
-                <Link to="/tasks" className={`hover:underline ${nightMode ? "text-gray-200" : "text-gray-800"}`}>
-                  📝 Goals & Tasks
+                <Link to="/goals" className={`hover:underline ${nightMode ? "text-gray-200" : "text-gray-800"}`}>
+                  📝 Goals & Progress
                 </Link>
               </nav>
             </div>
