@@ -10,7 +10,7 @@ const Dashboard = () => {
   const { nightMode, setNightMode} = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [username, setUsername] = useState("[John Doe]");
-  const apiUrl = import.meta.env.VITE_DEV_URL;
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const token = localStorage.getItem("token");
