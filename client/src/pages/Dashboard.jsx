@@ -1,14 +1,36 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import { useTheme } from "../components/ThemeContext";
+import GithubChart from "../components/GithubChart";
+import axios from "axios";
 
 
 
 const Dashboard = () => {
   const { nightMode, setNightMode} = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [username, setUsername] = useState("[John Doe]");
+  const apiUrl = import.meta.env.VITE_DEV_URL;
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    console.log(apiUrl)
+    const fetchUsername = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/user/details`, {
+          headers: {
+            Authorization: token,
+          },
+        });
+        const { userData } = response.data;
+        console.log("Fetched user data:", userData);
+        setUsername(userData.username);
+
+      } catch (error) {
+        console.error("Error fetching username:", error);
+      }
+    }
+    fetchUsername();
     localStorage.setItem("nightMode", nightMode);
   }, [nightMode]);
 
@@ -80,9 +102,10 @@ const Dashboard = () => {
           }`}
         >
           <h3 className="text-xl font-semibold mb-4">📈 Progress Chart</h3>
-          <div className="h-64 flex items-center justify-center border border-dashed rounded text-sm text-gray-400">
-            [Chart goes here]
+          <div className="h-64 flex flex-col border border-dashed rounded text-sm text-gray-400 overflow-hidden">
+            <GithubChart nightMode={nightMode} username={username} />
           </div>
+
         </section>
       </main>
     </div>
