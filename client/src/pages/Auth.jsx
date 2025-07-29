@@ -4,7 +4,7 @@ import { useTheme } from "../components/ThemeContext";
 import axios from 'axios';
 
 const Auth = () => {
-  const apiUrl = import.meta.env.VITE_DEV_URL;
+  const apiUrl = import.meta.env.VITE_API_URL;
   const { nightMode, setNightMode } = useTheme();
   const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({

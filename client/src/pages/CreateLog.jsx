@@ -5,7 +5,7 @@ import Sidebar from "../components/Sidebar";
 import { useTheme } from "../components/ThemeContext";
 
 const CreateLog = () => {
-  const apiUrl = import.meta.env.VITE_DEV_URL;
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [hoursSpent, setHoursSpent] = useState("");

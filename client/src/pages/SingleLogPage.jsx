@@ -6,7 +6,7 @@ import { useTheme } from "../components/ThemeContext";
 
 const SingleLogPage = () => {
   const { logId } = useParams();
-  const apiUrl = import.meta.env.VITE_DEV_URL;
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [log, setLog] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const { nightMode, setNightMode } = useTheme();
