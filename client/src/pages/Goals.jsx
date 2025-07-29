@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import GoalCard from "../components/GoalCard";
 
 const Goals = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_DEV_URL;
   const [goals, setGoals] = useState([]);
   const [newGoal, setNewGoal] = useState({
     title: "",

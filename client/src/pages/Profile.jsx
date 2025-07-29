@@ -4,7 +4,7 @@ import { useTheme } from "../components/ThemeContext";
 import axios from 'axios';
 import GithubStats from "../components/GithubStats";
 const Profile = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_DEV_URL;
 
   const { nightMode, setNightMode } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
