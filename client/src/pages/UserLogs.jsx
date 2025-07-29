@@ -5,7 +5,7 @@ import LogCard from "../components/LogCard"; // import LogCard
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../components/ThemeContext";
 const UserLogs = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_DEV_URL;
   const [logs, setLogs] = useState([]);
   const { nightMode, setNightMode } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(true);
