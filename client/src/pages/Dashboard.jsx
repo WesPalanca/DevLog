@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Sidebar from "../components/Sidebar";
 import { useTheme } from "../components/ThemeContext";
 import GithubChart from "../components/GithubChart";
@@ -10,10 +10,11 @@ const Dashboard = () => {
   const { nightMode, setNightMode} = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [username, setUsername] = useState("[John Doe]");
+  const [recentGoals, setRecentGoals] = useState([]);
   const apiUrl = import.meta.env.VITE_API_URL;
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     const fetchUsername = async () => {
       try {
         const response = await axios.get(`${apiUrl}/user/details`, {
@@ -33,9 +34,28 @@ const Dashboard = () => {
     localStorage.setItem("nightMode", nightMode);
   }, [nightMode]);
 
+  useEffect(() =>{
+    const fetchRecentGoals = async () => {
+      try{
+        const response = await axios.get(`${apiUrl}/goals/fetch/recent`, {
+          headers: { Authorization: token }
+        });
+        console.log("Fetched recent goals:", response.data);
+        const { goals } = response.data;
+        setRecentGoals(goals);
+      }
+      catch(error){
+        console.error("Error fetching recent goals:", error);
+
+      }
+
+    }
+    fetchRecentGoals();
+
+  }, [])
   return (
     <div
-      className={`flex min-h-screen transition-colors duration-300 ${
+      className={`overflow-hidden flex min-h-screen transition-colors duration-300 ${
         nightMode ? "bg-[#0d1117] text-white" : "bg-gray-50 text-gray-900"
       } `}
       style={{ position: "relative" }}
@@ -66,7 +86,13 @@ const Dashboard = () => {
             }`}
           >
             <h3 className="text-lg font-semibold mb-2">🧠 Goals</h3>
-            <p className="text-sm">Complete 50 LeetCode problems (42%)</p>
+            <div className="flex flex-col gap-2">
+              {recentGoals.map((goal) => (
+                <p key={goal.id} className="text-sm">
+                  <strong>{goal.title}</strong> {goal.description} ({goal.progress}%)
+                </p>
+              ))}
+            </div>
           </div>
 
           <div

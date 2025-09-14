@@ -87,3 +87,19 @@ export const deleteUserGoal = async (req, res) => {
       return res.status(500).json({success: false, message: "delete goal error: " + error.message});
   }
 };
+
+
+export const getRecentGoals = async (req, res) => {
+  try{
+    const userId = req.user.userId;
+    const recentGoals = await Goals.find().sort({createdAt: -1}).limit(3)
+    if (recentGoals.length === 0) {
+      return res.status(204).json({ success: true, message: "No goals yet." });
+    }
+    return res.status(200).json({ success: true, message: "Recent goals fetched successfully", goals: recentGoals });
+  }
+  catch(error){
+    console.log("error getting recent goals");
+    return res.status(500).json({success: false, message: "Recent Goal error: " + error.message});
+  }
+}
