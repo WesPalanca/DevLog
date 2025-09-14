@@ -1,7 +1,7 @@
 // routes/goals.js
 import express from 'express';
 
-import { createGoal, getUserGoals, updateUserGoal, deleteUserGoal } from '../controllers/goals.js';
+import { createGoal, getUserGoals, updateUserGoal, deleteUserGoal, getRecentGoals } from '../controllers/goals.js';
 import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -17,4 +17,5 @@ router.put('/update/:id', verifyToken, updateUserGoal);
 // Delete goal
 router.delete('/delete/:id', verifyToken, deleteUserGoal);
 
+router.get('/fetch/recent', verifyToken, getRecentGoals);
 export default router;
