@@ -42,7 +42,7 @@ const Dashboard = () => {
         });
         console.log("Fetched recent goals:", response.data);
         const { goals } = response.data;
-        setRecentGoals(goals);
+        setRecentGoals(Array.isArray(goals) ? goals : []);
       }
       catch(error){
         console.error("Error fetching recent goals:", error);
@@ -87,11 +87,13 @@ const Dashboard = () => {
           >
             <h3 className="text-lg font-semibold mb-2">🧠 Goals</h3>
             <div className="flex flex-col gap-2">
-              {recentGoals.map((goal) => (
+              {recentGoals && recentGoals.length > 0 ? recentGoals.map((goal) => (
                 <p key={goal.id} className="text-sm">
                   <strong>{goal.title}</strong> {goal.description} ({goal.progress}%)
                 </p>
-              ))}
+              )) : (
+                <p className="text-sm text-gray-400">No goals set yet.</p>
+              )}
             </div>
           </div>
 
